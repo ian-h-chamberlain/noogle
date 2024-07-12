@@ -70,6 +70,9 @@ export const usePagefindSearch = (): PagefindHooks => {
               pageLength: 0.6, // default value 0.75
               // Increasing the termSimilarity parameter is a good way to suppress pages that are ranking well for long extensions of search terms.
               termSimilarity: 1.5, // default value 1.0
+              // Repeated terms are not as important, this helps reduce the impact of
+              // examples with repeated function calls vs the impact of the actual function name
+              termFrequency: 0.1 // default 1.0
             },
           });
           // @ts-ignore

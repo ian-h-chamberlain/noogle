@@ -177,6 +177,27 @@ export default async function Page(props: { params: { path: string[] } }) {
     return undefined;
   }
 
+  const getWeight = (tag: string) => {
+    if (meta?.path?.at(0) === "builtins") {
+      // https://pagefind.app/docs/weighting/#default-rankings
+      const defaultWeight =
+        {
+          "h1": 7,
+          "h2": 6,
+          "h3": 5,
+          "h4": 4,
+          "h5": 3,
+          "h6": 2,
+        }[tag] || 1;
+
+      const weight = Math.min(3.0 * defaultWeight, 10);
+
+      return { "data-pagefind-weight": weight.toString() };
+    }
+
+    return {};
+  }
+
   return (
     <>
       <Toc mdxSource={source + externManualSrc} title={item?.meta.title} />
@@ -191,6 +212,7 @@ export default async function Page(props: { params: { path: string[] } }) {
           p: { xs: 1, md: 2 },
           bgcolor: "background.paper",
         }}
+        {...getWeight("main")} // default weight for most things
       >
         <HighlightBaseline />
         {meta?.path &&
@@ -198,7 +220,7 @@ export default async function Page(props: { params: { path: string[] } }) {
             idx === all.length - 1 ? (
               <React.Fragment key={idx}>
                 <meta data-pagefind-meta={`name:${attr}`} />
-                <Box component="h2" sx={{ display: "none" }}>
+                <Box component="h2" sx={{ display: "none" }} {...getWeight("h2")} >
                   {attr}
                 </Box>
               </React.Fragment>
@@ -206,10 +228,6 @@ export default async function Page(props: { params: { path: string[] } }) {
               <meta key={idx} data-pagefind-meta={`category:${attr}`} />
             )
           )}
-        <meta
-          data-pagefind-sort="weight[data-weight]"
-          data-weight={meta?.path?.at(0) === "builtins" ? "10" : "1"}
-        />
         <Box>
           <Box
             sx={{
@@ -228,10 +246,10 @@ export default async function Page(props: { params: { path: string[] } }) {
               id={item?.meta.title}
               variant="h2"
               component={"h1"}
-              data-pagefind-weight="15"
               sx={{
                 marginRight: "auto",
               }}
+              {...getWeight("h1")}
             >
               {item?.meta.title}
             </Typography>
